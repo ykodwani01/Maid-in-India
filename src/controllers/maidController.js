@@ -14,17 +14,40 @@ const getProfile = async (req, res) => {
     }
 };
 
-const addProfile = async (req,res) => {
-    try{
-        const newProfile = await maidService.addProfile(req.user.id,req.body);
-        return res.status(201).json(newProfile);
-
+const updateProfile = async (req, res) => {
+    try {
+      const profile = await maidService.updateProfile(req.user.id, req.body);
+      return res.status(200).json(profile);
     } catch (error) {
-        
-        return res.status(500).json({message : "Cant add to profile"});
+      console.error('Error in updateProfile:', error);
+      return res.status(500).json({ message: 'Server error' });
     }
 };
 
 
 
-module.exports = {getProfile,addProfile}
+const register = async (req,res) => {
+  try{
+      const newMaid = await maidService.register(req.body);
+      return res.status(201).json(newMaid);
+
+  } catch (error) {
+      
+      return res.status(500).json({message : "Cant add to profile"});
+  }
+};
+
+const login = async (req,res) => {
+  try{
+      const maid = await maidService.login(req.body);
+      return res.status(201).json(maid);
+
+  } catch (error) {
+      console.log(error.message);
+      return res.status(500).json({message : "Cant login"});
+  }
+};
+
+
+
+module.exports = {getProfile,register,login,updateProfile};

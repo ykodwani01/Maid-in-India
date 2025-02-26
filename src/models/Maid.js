@@ -1,40 +1,69 @@
-const mongoose = require("mongoose");
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../config/db_pg'); // adjust path as needed
 
-// function generateTimeSlots(startHour, endHour) {
-//   let slots = [];
-//   for (let hour = startHour; hour < endHour; hour++) {
-//     let start = `${hour}:00`;
-//     let end = `${hour + 1}:00`;
-//     slots.push(`${start}-${end}`);
-//   }
-//   return slots;
-// }
-
-// const timeSlots = generateTimeSlots(7, 23);
-
-const maidSchema = new mongoose.Schema({
-  user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-  gender : {type: String, enum:["Male","Female"],required : true},
-  govtId : {type : String, required:true},
-  imageUrl : {type : String, default : ""},
-  timeAvailable: [{ 
-    type: String, 
-    // enum: timeSlots, 
-    required: true 
-  }], 
-  daysAvailable: [{ 
-    type: String, 
-    // enum: Dayslots, 
-    required: true 
-  }], 
-  work : [{
-    type: String, required : true
-  }], // if maid can do cleaning or cooking or both
-  pricePerService: { 
-    type: Map, 
-    of: Number, 
-    required: true 
-  }, // Key-value pair of service vs its price 
+const Maid = sequelize.define('Maid', {
+  // Auto-generated primary key
+  maidId: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+  },
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  contact: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true,
+  },
+  password: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  gender: {
+    type: DataTypes.ENUM('Male', 'Female'),
+    allowNull: false,
+  },
+  location: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  govtId: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  imageUrl: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    defaultValue: '',
+  },
+  // Using Postgres ARRAY to store an array of strings
+  timeAvailable: {
+    type: DataTypes.ARRAY(DataTypes.STRING),
+    allowNull: true,
+  },
+  daysAvailable: {
+    type: DataTypes.ARRAY(DataTypes.STRING),
+    allowNull: true,
+  },
+  // Store an array of strings indicating types of work (e.g., cleaning, cooking)
+  cleaning: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+  },
+  cooking: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+  },
+  // Using JSON type to store key-value pairs for service prices
+  pricePerService: {
+    type: DataTypes.JSON,
+    allowNull: true,
+  },
+}, {
+  tableName: 'maids', // Specify the table name in your database
+  timestamps: true,   // Adds createdAt and updatedAt columns
 });
 
-module.exports = mongoose.model("Maid", maidSchema);
+module.exports = Maid;

@@ -7,7 +7,7 @@ const registeruser = async (userData) => {
   const { name, contactNumber, password,type,location,email } = userData;
 
   // Check if user already exists
-  let user = await User.findOne({ contactNumber });
+  let user = await User.findOne({ email });
   if (user) throw new Error("user already registered");
 
   // Hash password
@@ -17,12 +17,12 @@ const registeruser = async (userData) => {
   user = new User({ name, contactNumber, password: hashedPassword ,type, location,email});
   await user.save();
 
-  return { id: user._id, name: user.name, contactNumber: user.contactNumber,type:user.type};
+  return { id: user._id, name: user.name, contactNumber: user.contactNumber,type:user.type, email : user.email};
 };
 
 // Login user
-const loginuser = async ({ contactNumber, password }) => {
-  const user = await User.findOne({ contactNumber });
+const loginuser = async ({ email, password }) => {
+  const user = await User.findOne({ email });
   if (!user) throw new Error("Invalid credentials");
 
   // Compare password
