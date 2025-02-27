@@ -3,6 +3,10 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const connectDB = require("./config/db");
+const jwt = require("jsonwebtoken");
+const axios = require("axios");
+const session = require("express-session");
+
 const {sequelize,connectDB_pg} = require("./config/db_pg");
 const authRoutes = require("./routes/authRoutes");
 const maidRoutes = require("./routes/maidRoutes");
