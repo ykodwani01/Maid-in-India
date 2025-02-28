@@ -38,7 +38,7 @@ const googleauth = async (req, res) => {
 const googleCallback =  async (req, res) => {
 try {
     const { code } = req.query;
-
+     console.log("Before oauth2");
     // Step 1: Exchange code for Google Access Token
     const tokenResponse = await axios.post(
     "https://oauth2.googleapis.com/token",
@@ -50,7 +50,7 @@ try {
         grant_type: "authorization_code",
     }
     );
-
+    console.log("After oauth2");
     const { access_token, id_token } = tokenResponse.data;
 
     // Step 2: Verify the Google ID Token
