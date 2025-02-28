@@ -74,10 +74,10 @@ try {
         await newUser.save();
         uid = newUser._id;
     }
-
+    console.log("Before jwt");
     // Step 3: Generate JWT Token for the user
     const token = jwt.sign({ id: uid, name, email },process.env.JWT_SECRET,{ expiresIn: "23h" } );
-
+    console.log("After jwt");
     // Step 4: Send JWT token to the client
     // res.redirect("http://localhost:5173");
     res.redirect(`newapp://customer-home?token=${token}`);
