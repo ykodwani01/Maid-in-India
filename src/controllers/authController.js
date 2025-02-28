@@ -80,7 +80,8 @@ try {
     console.log("After jwt");
     // Step 4: Send JWT token to the client
     // res.redirect("http://localhost:5173");
-    res.redirect(`newapp://customer-home?token=${token}`);
+    // res.redirect(`newapp://customer-home?token=${token}`);
+  res.json({"token":token});
 } catch (error) {
     console.error("Error in Google Auth:", error.response?.data || error);
     res.status(500).json({ error: "Authentication failed" });
