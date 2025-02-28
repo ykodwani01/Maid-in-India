@@ -10,6 +10,8 @@ const session = require("express-session");
 const {sequelize,connectDB_pg} = require("./config/db_pg");
 const authRoutes = require("./routes/authRoutes");
 const maidRoutes = require("./routes/maidRoutes");
+// const bookRoutes = require("./routes/bookRoutes");
+
 dotenv.config();
 connectDB();
 connectDB_pg();
@@ -23,6 +25,7 @@ app.use(bodyParser.json());
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/maid", maidRoutes);
+// app.use("/api/book",bookRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

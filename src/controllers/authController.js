@@ -1,6 +1,7 @@
 const authService = require("../services/authService");
 const axios = require("axios");
 const jwt = require("jsonwebtoken");
+const User = require("../models/User");
 // Register a new user
 const register = async (req, res) => {
   try {
@@ -59,15 +60,27 @@ try {
 
     const { sub, name, email, picture } = googleUser.data;
 
+    const user = await User.findOne({ email });
+    let uid = user?._id || 0;
+
+    if (!user) { 
+        const newUser = new User({ 
+            name, 
+            email, 
+            location: "Ahmedabad", 
+            password: "GoogleAuthHenceNoPasswordSecretKey@123456"
+        });
+
+        await newUser.save();
+        uid = newUser._id;
+    }
+
     // Step 3: Generate JWT Token for the user
-    const token = jwt.sign(
-    { id: sub, name, email, picture },
-    process.env.JWT_SECRET,
-    { expiresIn: "1h" } // Token expires in 1 hour
-    );
+    const token = jwt.sign({ id: uid, name, email },process.env.JWT_SECRET,{ expiresIn: "23h" } );
 
     // Step 4: Send JWT token to the client
     // res.redirect("http://localhost:5173");
+    // res.redirect(`newapp://customer-home?token=${token}`);
     res.json({ token, user: { name, email, picture } });
 } catch (error) {
     console.error("Error in Google Auth:", error.response?.data || error);
