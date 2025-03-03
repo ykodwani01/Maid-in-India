@@ -38,7 +38,7 @@ const googleauth = async (req, res) => {
 const googleCallback =  async (req, res) => {
 try {
     const { code } = req.query;
-
+     console.log("Before oauth2");
     // Step 1: Exchange code for Google Access Token
     const tokenResponse = await axios.post(
     "https://oauth2.googleapis.com/token",
@@ -50,7 +50,7 @@ try {
         grant_type: "authorization_code",
     }
     );
-
+    console.log("After oauth2");
     const { access_token, id_token } = tokenResponse.data;
 
     // Step 2: Verify the Google ID Token
@@ -74,14 +74,14 @@ try {
         await newUser.save();
         uid = newUser._id;
     }
-
+    console.log("Before jwt");
     // Step 3: Generate JWT Token for the user
     const token = jwt.sign({ id: uid, name, email },process.env.JWT_SECRET,{ expiresIn: "23h" } );
-
+    console.log("After jwt");
     // Step 4: Send JWT token to the client
     // res.redirect("http://localhost:5173");
     // res.redirect(`newapp://customer-home?token=${token}`);
-    res.json({ token, user: { name, email, picture } });
+  res.json({"token":token});
 } catch (error) {
     console.error("Error in Google Auth:", error.response?.data || error);
     res.status(500).json({ error: "Authentication failed" });
