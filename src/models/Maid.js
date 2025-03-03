@@ -10,24 +10,25 @@ const Maid = sequelize.define('Maid', {
   },
   name: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
   },
   contact: {
     type: DataTypes.STRING,
     allowNull: false,
     unique: true,
   },
-  password: {
-    type: DataTypes.STRING,
+  profileCreated: {
+    type: DataTypes.BOOLEAN,
     allowNull: false,
+    defaultValue: false,
   },
   gender: {
     type: DataTypes.ENUM('Male', 'Female'),
-    allowNull: false,
+    allowNull: true,
   },
   location: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
   },
   govtId: {
     type: DataTypes.STRING,
@@ -50,11 +51,11 @@ const Maid = sequelize.define('Maid', {
   // Store an array of strings indicating types of work (e.g., cleaning, cooking)
   cleaning: {
     type: DataTypes.BOOLEAN,
-    allowNull: false,
+    allowNull: true,
   },
   cooking: {
     type: DataTypes.BOOLEAN,
-    allowNull: false,
+    allowNull: true,
   },
   // Using JSON type to store key-value pairs for service prices
   pricePerService: {
