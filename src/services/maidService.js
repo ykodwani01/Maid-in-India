@@ -44,7 +44,7 @@ const updateProfile = async(id,data) => {
     let profileCreated=false;
     const updatedData = {...data,profileCreated};
     await maid.update(updatedData);
-    if(maid.name!=null && maid.gender!=null && maid.location!=null && maid.govtId!=null && maid.imageUrl!=null && maid.timeAvailable!=null && maid.daysAvailable!=null && maid.cleaning!=null && maid.cooking!=null){
+    if(maid.name!=null && maid.gender!=null && maid.location!=null && maid.govtId!=null && maid.imageUrl!=null && maid.timeAvailable!=null && maid.cleaning!=null && maid.cooking!=null){
       profileCreated = true;
     }
     maid.update({profileCreated:profileCreated});
