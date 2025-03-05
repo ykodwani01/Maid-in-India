@@ -41,13 +41,10 @@ const Maid = sequelize.define('Maid', {
   },
   // Using Postgres ARRAY to store an array of strings
   timeAvailable: {
-    type: DataTypes.ARRAY(DataTypes.STRING),
+    type: DataTypes.JSON,
     allowNull: true,
   },
-  daysAvailable: {
-    type: DataTypes.ARRAY(DataTypes.STRING),
-    allowNull: true,
-  },
+  
   // Store an array of strings indicating types of work (e.g., cleaning, cooking)
   cleaning: {
     type: DataTypes.BOOLEAN,

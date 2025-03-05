@@ -45,6 +45,22 @@ const verifyOtp = async (req, res) => {
     console.error('Error in verifyOtp:', error);
     return res.status(500).json({ message: 'Server error' });
   }
-}
+};
 
-module.exports = {getProfile,updateProfile, sendOtp, verifyOtp};
+const bookMaid = async (req,res) => {
+  try {
+    const data = req.body
+    let userId = req.user.id;
+    console.log(req.body);
+    console.log(req.user)
+    console.log(userId);
+    console.log(process.env.JWT_SECRET);
+    const booking = await maidService.createBooking(data,userId);
+    return res.status(200).json(booking);
+  } catch (error) {
+    console.error('Error in bookMaid:', error);
+    return res.status(500).json({ message: 'Server error' });
+  }
+};
+
+module.exports = {getProfile,updateProfile, sendOtp, verifyOtp, bookMaid};

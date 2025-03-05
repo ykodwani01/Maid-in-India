@@ -7,4 +7,7 @@ maidRoutes.get("/profile", authMiddleware,maidController.getProfile);
 maidRoutes.put("/profile", authMiddleware,maidController.updateProfile);
 maidRoutes.post("/verify-otp", maidController.verifyOtp);
 maidRoutes.post("/send-otp", maidController.sendOtp);
+maidRoutes.post("/book", authMiddleware,maidController.bookMaid);
+// maidRoutes.post("/cancel", authMiddleware,maidController.cancelBooking);
+// maidRoutes.get("/search", authMiddleware,maidController.searchMaid);
 module.exports = maidRoutes;

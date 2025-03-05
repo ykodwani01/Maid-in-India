@@ -1,6 +1,6 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/db_pg'); // adjust path as needed
-const Maid = require('./maid')(sequelize, DataTypes);
+const Maid = require('./Maid');
 
 const Booking = sequelize.define('Booking', {
     BookingId: {
@@ -21,12 +21,8 @@ const Booking = sequelize.define('Booking', {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    booking_date: {
-      type: DataTypes.DATEONLY,
-      allowNull: false,
-    },
     slot: {
-      type: DataTypes.STRING,
+      type: DataTypes.JSON,
       allowNull: false,
     },
     created_at: {
@@ -37,8 +33,8 @@ const Booking = sequelize.define('Booking', {
         type : DataTypes.BOOLEAN
     }
   }, {
-    tableName: 'Booking',
+    tableName: 'bookings',
     timestamps: false
   });
-Maid.hasMany(Booking, { foreignKey: 'maid_id' });
+Maid.hasMany(Booking, { foreignKey: 'maidId' });
 module.exports = Booking;

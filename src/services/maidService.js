@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const otpGenerator = require("otp-generator");
 const twilio = require("twilio");
-
+const Booking = require('../models/Booking');
 const getProfile = async (maidId) => {
   try {
     // console.log(maidId);
@@ -112,10 +112,29 @@ const verifyOtp = async (contact, code) => {
   }
 };
 
-const createBooking = async(req,res) => {
+
+// const searchMaid = async (data) => {
+//   try {
+//     const maids = await Maid.findAll({ where: data });
+//     return maids;
+//   }
+//   catch (error) {
+//     throw new Error("Error searching maids: " + error.message);
+//   }
+// };
+
+const createBooking = async(data,userId) => {
   try {
-    const {maidId,userId,booking_date,slot} = req.body;
-    const booking = await Booking.create({maidId,userId,booking_date,slot,paymentStatus:false});
+    const {maidId,slot} = data;
+    const maid = await Maid.findByPk(maidId);
+    const day = Object.keys(slot)[0]; // "Tuesday"
+    const time = slot[day]; // "9:00"
+    const availableMaids = maid.timeAvailable[day].includes(time);
+    if (!availableMaids) {
+      throw new Error("Maid is not available at this time");
+    }
+
+    const booking = await Booking.create({maidId,userId,slot,paymentStatus:false});
     return booking;
   } catch (error) {
     throw new Error("Error creating booking: " + error.message);

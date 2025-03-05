@@ -1,5 +1,6 @@
 const { sequelize } = require('./db_pg');
-
+require('../models/Maid');
+require('../models/Booking');
 const syncDB = async () => {
   try {
     // Use { force: true } to drop and recreate tables (development only)

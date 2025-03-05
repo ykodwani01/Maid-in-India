@@ -61,7 +61,7 @@ try {
     const { sub, name, email, picture } = googleUser.data;
 
     const user = await User.findOne({ email });
-    let uid = user?._id || 0;
+    let uid = user?.id || 0;
 
     if (!user) { 
         const newUser = new User({ 
@@ -72,11 +72,12 @@ try {
         });
 
         await newUser.save();
-        uid = newUser._id;
+        uid = newUser.id;
     }
     console.log("Before jwt");
     // Step 3: Generate JWT Token for the user
     const token = jwt.sign({ id: uid, name, email },process.env.JWT_SECRET,{ expiresIn: "23h" } );
+    console.log(process.env.JWT_SECRET);  
     console.log("After jwt");
     // Step 4: Send JWT token to the client
     // res.redirect("http://localhost:5173");
