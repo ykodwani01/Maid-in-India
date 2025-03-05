@@ -1,6 +1,4 @@
 const { sequelize } = require('./db_pg');
-const User = require('../models/User');
-const Maid = require('../models/Maid');
 
 const syncDB = async () => {
   try {

@@ -1,7 +1,7 @@
 const Maid = require('../models/Maid');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-
+const User = require('../models/User');
 const otpGenerator = require("otp-generator");
 const twilio = require("twilio");
 
@@ -38,10 +38,16 @@ const updateProfile = async(id,data) => {
     if (!maid) {
       throw new Error("Maid not found");
     }
-    const {name,gender,location,govtId,imageUrl,timeAvailable,daysAvailable,cleaning,cooking} = data;
-    const profileCreated = true;
-    const updatedData = {name,gender, location, govtId, imageUrl, timeAvailable, daysAvailable, cleaning, cooking, profileCreated};
+    // const {name,gender,location,govtId,imageUrl,timeAvailable,daysAvailable,cleaning,cooking} = data;
+    // const profileCreated = true;
+    // const updatedData = {name,gender, location, govtId, imageUrl, timeAvailable, daysAvailable, cleaning, cooking, profileCreated};
+    let profileCreated=false;
+    const updatedData = {...data,profileCreated};
     await maid.update(updatedData);
+    if(maid.name!=null && maid.gender!=null && maid.location!=null && maid.govtId!=null && maid.imageUrl!=null && maid.timeAvailable!=null && maid.daysAvailable!=null && maid.cleaning!=null && maid.cooking!=null){
+      profileCreated = true;
+    }
+    maid.update({profileCreated:profileCreated});
     return maid;
   } catch (error) {
     throw new Error("Error updating profile: " + error.message);
@@ -105,4 +111,14 @@ const verifyOtp = async (contact, code) => {
     throw new Error("OTP verification failed");
   }
 };
-module.exports = {getProfile,updateProfile,verifyOtp,sendOtp};
+
+const createBooking = async(req,res) => {
+  try {
+    const {maidId,userId,booking_date,slot} = req.body;
+    const booking = await Booking.create({maidId,userId,booking_date,slot,paymentStatus:false});
+    return booking;
+  } catch (error) {
+    throw new Error("Error creating booking: " + error.message);
+  }
+}
+module.exports = {getProfile,updateProfile,verifyOtp,sendOtp,createBooking};
