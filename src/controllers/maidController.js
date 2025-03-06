@@ -47,14 +47,31 @@ const verifyOtp = async (req, res) => {
   }
 };
 
+const searchMaid = async (req, res) => {
+  try {
+    const data = req.body;
+    const maids = await maidService.searchMaid(data);
+    return res.status(200).json(maids);
+  } catch (error) {
+    console.error('Error in searchMaid:', error);
+    return res.status(500).json({ message: 'Server error' });
+  }
+}
+
+// const cancelBooking = async (req, res) => {
+//   try {
+//     const bookingId = req.body.bookingId;
+//     const result = await maidService.cancelBooking(bookingId);
+//     return res.status(200).json(result);
+//   } catch (error) {
+//     console.error('Error in cancelBooking:', error);
+//     return res.status(500).json({ message: 'Server error' });
+//   }
+// }
 const bookMaid = async (req,res) => {
   try {
     const data = req.body
     let userId = req.user.id;
-    console.log(req.body);
-    console.log(req.user)
-    console.log(userId);
-    console.log(process.env.JWT_SECRET);
     const booking = await maidService.createBooking(data,userId);
     return res.status(200).json(booking);
   } catch (error) {
@@ -63,4 +80,4 @@ const bookMaid = async (req,res) => {
   }
 };
 
-module.exports = {getProfile,updateProfile, sendOtp, verifyOtp, bookMaid};
+module.exports = {getProfile,updateProfile, sendOtp, verifyOtp, bookMaid,searchMaid};

@@ -5,6 +5,8 @@ const User = require('../models/User');
 const otpGenerator = require("otp-generator");
 const twilio = require("twilio");
 const Booking = require('../models/Booking');
+const { Op } = require('sequelize');
+
 const getProfile = async (maidId) => {
   try {
     // console.log(maidId);
@@ -113,15 +115,46 @@ const verifyOtp = async (contact, code) => {
 };
 
 
-// const searchMaid = async (data) => {
-//   try {
-//     const maids = await Maid.findAll({ where: data });
-//     return maids;
-//   }
-//   catch (error) {
-//     throw new Error("Error searching maids: " + error.message);
-//   }
-// };
+const searchMaid = async (data) => {
+  try {
+    const { location, slot } = data;
+    const day = Object.keys(slot)[0];
+    const time = slot[day];
+    const service = data.service;
+
+    let whereClause = { location: location };
+    console.log(location);
+    console.log(service);
+    if (service === "cleaning") {
+      whereClause.cleaning = "true";
+    } else if (service === "cooking") {
+      whereClause.cooking = "true";
+    }
+    else {
+      whereClause.cooking = "false";
+      whereClause.cleaning = "false";
+    }
+
+    const maids = await Maid.findAll({
+      where: whereClause
+    });
+
+    console.log(maids);
+    const filteredMaids = [];
+    for (const maid of maids) {
+      const availability = maid.timeAvailable || {};
+      if (availability[day] && availability[day].includes(time)) {
+        filteredMaids.push(maid);
+      }
+    }
+
+    // console.log(filteredMaids);
+    return filteredMaids;
+  }
+  catch (error) {
+    throw new Error("Error searching maids: " + error.message);
+  }
+};
 
 const createBooking = async(data,userId) => {
   try {
@@ -140,4 +173,6 @@ const createBooking = async(data,userId) => {
     throw new Error("Error creating booking: " + error.message);
   }
 }
-module.exports = {getProfile,updateProfile,verifyOtp,sendOtp,createBooking};
+
+
+module.exports = {getProfile,updateProfile,verifyOtp,sendOtp,createBooking,searchMaid};
