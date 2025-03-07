@@ -95,7 +95,6 @@ const cancelBooking = async (req,res) => {
   try {
     const data = req.body;
     let uid = req.user.id;
-    console.log(uid);
     const booking = await maidService.cancelBooking(uid,data);
     return res.status(200).json(booking);
   } catch (error) {

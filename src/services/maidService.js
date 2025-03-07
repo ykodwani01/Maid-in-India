@@ -104,8 +104,6 @@ const searchMaid = async (data) => {
     const service = data.service;
 
     let whereClause = { location: location };
-    console.log(location);
-    console.log(service);
     if (service === "cleaning") {
       whereClause.cleaning = "true";
     } else if (service === "cooking") {
@@ -120,7 +118,7 @@ const searchMaid = async (data) => {
       where: whereClause
     });
 
-    // console.log(maids);
+
     const filteredMaids = [];
     for (const maid of maids) {
       const availability = maid.timeAvailable || {};
@@ -129,7 +127,7 @@ const searchMaid = async (data) => {
       }
     }
 
-    // console.log(filteredMaids);
+  
     return filteredMaids;
   }
   catch (error) {
@@ -166,13 +164,12 @@ const bookingConfirm = async (bookingId) => {
     const maid = await Maid.findByPk(maidId);
     const day = Object.keys(booking.slot)[0];
     const time = booking.slot[day];
-    console.log(day,time,maid.timeAvailable[day]);
+    
     maid.timeAvailable[day] = maid.timeAvailable[day].filter(slot => slot !== time);
     maid.changed('timeAvailable', true);
 
     // Save the changes to the database
     await maid.save();
-    console.log(maid.timeAvailable);
     return booking;
   } catch (error) {
     throw new Error("Error confirming booking: " + error.message);
