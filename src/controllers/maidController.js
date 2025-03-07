@@ -68,6 +68,17 @@ const searchMaid = async (req, res) => {
 //     return res.status(500).json({ message: 'Server error' });
 //   }
 // }
+const confirmBooking = async (req, res) => {
+  try{
+    const bookingId = req.body.bookingId;
+    const result = await maidService.bookingConfirm(bookingId);
+    return res.status(200).json(result);
+  } catch(error){
+    console.error('Error in confirmBooking:', error);
+    return res.status(500).json({ message: 'Server error' });
+  }
+};
+
 const bookMaid = async (req,res) => {
   try {
     const data = req.body
@@ -80,4 +91,40 @@ const bookMaid = async (req,res) => {
   }
 };
 
-module.exports = {getProfile,updateProfile, sendOtp, verifyOtp, bookMaid,searchMaid};
+const cancelBooking = async (req,res) => {
+  try {
+    const data = req.body;
+    let uid = req.user.id;
+    console.log(uid);
+    const booking = await maidService.cancelBooking(uid,data);
+    return res.status(200).json(booking);
+  } catch (error) {
+    console.error('Error in cancelBooking:', error);
+    return res.status(500).json({ message: 'Server error' });
+  }
+};
+
+const getBookings = async (req,res) => {
+  try {
+    const uid = req.user.id;
+    const bookings = await maidService.getBookings(uid);
+    return res.status(200).json(bookings);
+  } catch (error) {
+    console.error('Error in getBookings:', error);
+    return res.status(500).json({ message: 'Server error' });
+  }
+};
+
+const getBookingsById = async (req,res) => {
+  try{
+    const uid = req.user.id;
+    const bookingId = req.params.id;
+    const booking = await maidService.getBookingsById(uid,bookingId);
+    return res.status(200).json(booking);
+  }
+  catch (error){
+    return res.status(500).json({ message: 'Server error'});
+  }
+};
+
+module.exports = {getProfile,updateProfile, sendOtp, verifyOtp, bookMaid,searchMaid,confirmBooking,cancelBooking,getBookings,getBookingsById};

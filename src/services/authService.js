@@ -4,7 +4,7 @@ const User = require("../models/User");
 
 // Register a new user
 const registeruser = async (userData) => {
-  const { name, contactNumber, password,type,location,email } = userData;
+  const { name, contactNumber, password,location,email } = userData;
 
   // Check if user already exists
   let user = await User.findOne({ email });
@@ -14,10 +14,10 @@ const registeruser = async (userData) => {
   const hashedPassword = await bcrypt.hash(password, 10);
 
   // Create new user entry
-  user = new User({ name, contactNumber, password: hashedPassword ,type, location,email});
+  user = new User({ name, contactNumber, password: hashedPassword , location,email});
   await user.save();
 
-  return { id: user._id, name: user.name, contactNumber: user.contactNumber,type:user.type, email : user.email};
+  return { id: user._id, name: user.name, contactNumber: user.contactNumber, email : user.email};
 };
 
 // Login user
@@ -32,7 +32,7 @@ const loginuser = async ({ email, password }) => {
   // Generate JWT token
   const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "23h" });
 
-  return { token, user: { id: user._id, type:user.type } };
+  return { token, user: { id: user._id} };
 };
 
 

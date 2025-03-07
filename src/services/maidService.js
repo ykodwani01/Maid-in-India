@@ -18,31 +18,12 @@ const getProfile = async (maidId) => {
 };
 
 
-// const login = async (data) => {
-//   const contactNumber = data.contact;
-//   const password = data.password;
-//   const maid = await Maid.findOne({ where: { contact:contactNumber } });
-//   if (!maid) {
-//     throw new Error("Invalid Maid");
-//   }
-
-//   const isMatch = await bcrypt.compare(password, maid.password);
-//   if (!isMatch) throw new Error("Invalid credentials");
-
-//   const token = jwt.sign({ id: maid.maidId }, process.env.JWT_SECRET, { expiresIn: "23h" });
-
-//   return { token, maid: { id: maid.id, name: maid.name } };
-// };
-
 const updateProfile = async(id,data) => {
   try {
     const maid = await Maid.findByPk(id);
     if (!maid) {
       throw new Error("Maid not found");
     }
-    // const {name,gender,location,govtId,imageUrl,timeAvailable,daysAvailable,cleaning,cooking} = data;
-    // const profileCreated = true;
-    // const updatedData = {name,gender, location, govtId, imageUrl, timeAvailable, daysAvailable, cleaning, cooking, profileCreated};
     let profileCreated=false;
     const updatedData = {...data,profileCreated};
     await maid.update(updatedData);
@@ -139,7 +120,7 @@ const searchMaid = async (data) => {
       where: whereClause
     });
 
-    console.log(maids);
+    // console.log(maids);
     const filteredMaids = [];
     for (const maid of maids) {
       const availability = maid.timeAvailable || {};
@@ -172,7 +153,82 @@ const createBooking = async(data,userId) => {
   } catch (error) {
     throw new Error("Error creating booking: " + error.message);
   }
+};
+
+const bookingConfirm = async (bookingId) => {
+  try {
+    const booking = await Booking.findByPk(bookingId);
+    if (!booking) {
+      throw new Error("Booking not found");
+    }
+    await booking.update({paymentStatus:true});
+    const maidId = booking.maidId;
+    const maid = await Maid.findByPk(maidId);
+    const day = Object.keys(booking.slot)[0];
+    const time = booking.slot[day];
+    console.log(day,time,maid.timeAvailable[day]);
+    maid.timeAvailable[day] = maid.timeAvailable[day].filter(slot => slot !== time);
+    maid.changed('timeAvailable', true);
+
+    // Save the changes to the database
+    await maid.save();
+    console.log(maid.timeAvailable);
+    return booking;
+  } catch (error) {
+    throw new Error("Error confirming booking: " + error.message);
+  }
+};
+
+//cancel booking by user only
+const cancelBooking = async(uid,data) => {
+    try{
+      const bookingId = data.bookingId;
+      const booking = await Booking.findByPk(bookingId);
+      if (!booking) {
+        throw new Error("Booking not found");
+      }
+      if(booking.userId!=uid){
+        throw new Error("Unauthorized");
+      }
+      const maidId = booking.maidId;
+      const maid = await Maid.findByPk(maidId);
+      const day = Object.keys(booking.slot)[0];
+      const time = booking.slot[day];
+      maid.timeAvailable[day].push(time);
+      maid.changed('timeAvailable', true);
+
+    // Save the changes to the database
+      await maid.save();
+      await booking.destroy();
+    }
+    catch(error){
+      throw new Error("Error cancelling booking: " + error.message);
+    }
+};
+
+const getBookings = async(uid) => {
+  try{
+    const bookings = await Booking.findAll({where:{userId:uid}});
+    return bookings;
+  }
+  catch(error){
+    throw new Error("Error fetching bookings: " + error.message);
+  }
+};
+
+const getBookingsById = async(uid,bookingId) => {
+  try{
+    const booking = await Booking.findByPk(bookingId);
+    if(booking.userId!=uid){
+      throw new Error("Unauthorized");
+    }
+    return booking;
+  }
+  catch(error){
+    throw new Error("Error fetching booking: " + error.message);
+  }
 }
 
+//google oauth user backend api
 
-module.exports = {getProfile,updateProfile,verifyOtp,sendOtp,createBooking,searchMaid};
+module.exports = {getProfile,updateProfile,verifyOtp,sendOtp,createBooking,searchMaid,bookingConfirm,cancelBooking,getBookings,getBookingsById};
