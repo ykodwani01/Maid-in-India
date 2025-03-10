@@ -88,4 +88,15 @@ try {
     res.status(500).json({ error: "Authentication failed" });
   }
 };
-module.exports = { register, login, googleauth, googleCallback };
+
+const verifyGoogle = async (req,res) => {
+  try{
+    const data = req.body;
+    // console.log(data);
+    const user = await authService.verifyGoogle(data);
+    res.status(200).json({success: true, user});
+  } catch(error){
+    res.status(400).json({success: false, message: error.message});
+  }
+};
+module.exports = { register, login, googleauth, googleCallback , verifyGoogle};
