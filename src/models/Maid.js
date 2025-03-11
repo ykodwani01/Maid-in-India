@@ -59,6 +59,10 @@ const Maid = sequelize.define('Maid', {
     type: DataTypes.JSON,
     allowNull: true,
   },
+  rating : {
+    type: DataTypes.FLOAT,
+    allowNull: true,
+  }
 }, {
   tableName: 'maids', // Specify the table name in your database
   timestamps: true,   // Adds createdAt and updatedAt columns

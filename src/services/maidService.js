@@ -98,7 +98,7 @@ const verifyOtp = async (contact, code) => {
 
 const searchMaid = async (data) => {
   try {
-    const { location, slot } = data;
+    const { location, slot,type } = data;
     
     const service = data.service;
 
@@ -124,18 +124,42 @@ const searchMaid = async (data) => {
     if(!data.slot || data.slot==null){
       return maids;
     }
-    const day = Object.keys(slot)[0];
-    const time = slot[day];
+    
     
     const filteredMaids = [];
-    for (const maid of maids) {
-      const availability = maid.timeAvailable || {};
-      if (availability[day] && availability[day].includes(time)) {
-        filteredMaids.push(maid);
+    // for (const maid of maids) {
+    //   const availability = maid.timeAvailable || {};
+    //   if (availability[day] && availability[day].includes(time)) {
+    //     filteredMaids.push(maid);
+    //   }
+    // }
+
+    if(type==1){
+      const day = "Monday";
+      for (const maid of maids) {
+        const availability = maid.timeAvailable || {};
+        if (availability[day] && availability[day].includes(time)) {
+          filteredMaids.push(maid);
+        }
       }
     }
-
-  
+    else if(type==2){
+      const day = "Tuesday";
+      for (const maid of maids) {
+        const availability = maid.timeAvailable || {};
+        if (availability[day] && availability[day].includes(time)) {
+          filteredMaids.push(maid);
+        }
+      }
+    }
+    else{
+      for (const maid of maids) {
+        const availability = maid.timeAvailable || {};
+        if ((availability["Monday"] && availability["Monday"].includes(time)) || (availability["Tuesday"] && availability["Tuesday"].includes(time))) {
+          filteredMaids.push(maid);
+        }
+      }
+    }
     return filteredMaids;
   }
   catch (error) {
@@ -145,16 +169,22 @@ const searchMaid = async (data) => {
 
 const createBooking = async(data,userId) => {
   try {
-    const {maidId,slot} = data;
+    const {maidId,slot,type} = data;
     const maid = await Maid.findByPk(maidId);
-    const day = Object.keys(slot)[0]; // "Tuesday"
-    const time = slot[day]; // "9:00"
-    const availableMaids = maid.timeAvailable[day].includes(time);
-    if (!availableMaids) {
-      throw new Error("Maid is not available at this time");
+    
+    let time = {};
+    if(type==1){
+      time = {"Monday":slot, "Wednesday" : slot, "Friday" : slot};
+    }
+    else if(type==2){
+      time = {"Tuesday":slot, "Thursday" : slot, "Saturday" : slot};
+    }
+    else{
+      time = {"Monday":slot, "Tuesday":slot, "Wednesday" : slot, "Thursday" : slot, "Friday" : slot, "Saturday" : slot, "Sunday" :slot};
     }
 
-    const booking = await Booking.create({maidId,userId,slot,paymentStatus:false});
+
+    const booking = await Booking.create({maidId,userId,slot:time,paymentStatus:false});
     return booking;
   } catch (error) {
     throw new Error("Error creating booking: " + error.message);
@@ -170,10 +200,12 @@ const bookingConfirm = async (bookingId) => {
     await booking.update({paymentStatus:true});
     const maidId = booking.maidId;
     const maid = await Maid.findByPk(maidId);
-    const day = Object.keys(booking.slot)[0];
-    const time = booking.slot[day];
-    
-    maid.timeAvailable[day] = maid.timeAvailable[day].filter(slot => slot !== time);
+
+    for (const day in booking.slot) {
+      const time = booking.slot[day];
+      maid.timeAvailable[day] = maid.timeAvailable[day].filter(slot => slot !== time);
+    }
+
     maid.changed('timeAvailable', true);
 
     // Save the changes to the database
@@ -197,10 +229,11 @@ const cancelBooking = async(uid,data) => {
       }
       const maidId = booking.maidId;
       const maid = await Maid.findByPk(maidId);
-      const day = Object.keys(booking.slot)[0];
-      const time = booking.slot[day];
-      maid.timeAvailable[day].push(time);
-      maid.changed('timeAvailable', true);
+      for (const day in booking.slot) {
+        const time = booking.slot[day];
+        maid.timeAvailable[day].push(time);
+        maid.changed('timeAvailable', true);
+      }
 
     // Save the changes to the database
       await maid.save();
@@ -232,7 +265,7 @@ const getBookingsById = async(uid,bookingId) => {
   catch(error){
     throw new Error("Error fetching booking: " + error.message);
   }
-}
+};
 
 
 
