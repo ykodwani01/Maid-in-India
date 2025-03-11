@@ -99,8 +99,7 @@ const verifyOtp = async (contact, code) => {
 const searchMaid = async (data) => {
   try {
     const { location, slot } = data;
-    const day = Object.keys(slot)[0];
-    const time = slot[day];
+    
     const service = data.service;
 
     let whereClause = { location: location };
@@ -109,16 +108,25 @@ const searchMaid = async (data) => {
     } else if (service === "cooking") {
       whereClause.cooking = "true";
     }
+    else if(service === "both"){
+      whereClause.cleaning = "true";
+      whereClause.cooking = "true";
+    }
     else {
-      whereClause.cooking = "false";
-      whereClause.cleaning = "false";
+      //if service is null search only by location
     }
 
     const maids = await Maid.findAll({
       where: whereClause
     });
 
-
+    
+    if(!data.slot || data.slot==null){
+      return maids;
+    }
+    const day = Object.keys(slot)[0];
+    const time = slot[day];
+    
     const filteredMaids = [];
     for (const maid of maids) {
       const availability = maid.timeAvailable || {};
@@ -226,6 +234,6 @@ const getBookingsById = async(uid,bookingId) => {
   }
 }
 
-//google oauth user backend api
+
 
 module.exports = {getProfile,updateProfile,verifyOtp,sendOtp,createBooking,searchMaid,bookingConfirm,cancelBooking,getBookings,getBookingsById};
