@@ -29,6 +29,10 @@ const Booking = sequelize.define('Booking', {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
     },
+    service : {
+      type : DataTypes.STRING,
+      allowNull : true
+    },
     paymentStatus : {
         type : DataTypes.BOOLEAN
     }
