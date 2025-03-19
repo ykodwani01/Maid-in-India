@@ -246,7 +246,12 @@ const cancelBooking = async(uid,data) => {
 
 const getBookings = async(uid) => {
   try{
-    const bookings = await Booking.findAll({where:{userId:uid}});
+    const bookings = await Booking.findAll({
+      where:{
+        userId:uid, 
+        paymentStatus : true
+      }
+    });
     return bookings;
   }
   catch(error){
