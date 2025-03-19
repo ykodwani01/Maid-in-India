@@ -169,7 +169,7 @@ const searchMaid = async (data) => {
 
 const createBooking = async(data,userId) => {
   try {
-    const {maidId,slot,type} = data;
+    const {maidId,slot,type,service} = data;
     const maid = await Maid.findByPk(maidId);
     
     let time = {};
@@ -184,7 +184,7 @@ const createBooking = async(data,userId) => {
     }
 
 
-    const booking = await Booking.create({maidId,userId,slot:time,paymentStatus:false});
+    const booking = await Booking.create({maidId,userId,slot:time,paymentStatus:false,service});
     return booking;
   } catch (error) {
     throw new Error("Error creating booking: " + error.message);
