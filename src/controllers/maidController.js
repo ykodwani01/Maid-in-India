@@ -58,16 +58,7 @@ const searchMaid = async (req, res) => {
   }
 }
 
-// const cancelBooking = async (req, res) => {
-//   try {
-//     const bookingId = req.body.bookingId;
-//     const result = await maidService.cancelBooking(bookingId);
-//     return res.status(200).json(result);
-//   } catch (error) {
-//     console.error('Error in cancelBooking:', error);
-//     return res.status(500).json({ message: 'Server error' });
-//   }
-// }
+
 const confirmBooking = async (req, res) => {
   try{
     const bookingId = req.body.bookingId;
