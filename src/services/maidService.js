@@ -150,7 +150,7 @@ const searchMaid = async (data) => {
     else{
       for (const maid of maids) {
         const availability = maid.timeAvailable || {};
-        if ((availability["Monday"] && availability["Monday"].includes(time)) || (availability["Tuesday"] && availability["Tuesday"].includes(time))) {
+        if ((availability["Monday"]) || (availability["Tuesday"])) {
           filteredMaids.push(maid);
         }
       }
