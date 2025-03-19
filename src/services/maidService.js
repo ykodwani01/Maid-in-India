@@ -19,18 +19,24 @@ const getProfile = async (maidId) => {
 
 
 const updateProfile = async(id,data) => {
-  try {
+    try {
     const maid = await Maid.findByPk(id);
     if (!maid) {
       throw new Error("Maid not found");
     }
-    let profileCreated=false;
-    const updatedData = {...data,profileCreated};
-    await maid.update(updatedData);
-    if(maid.name!=null && maid.gender!=null && maid.location!=null && maid.govtId!=null && maid.imageUrl!=null && maid.timeAvailable!=null && maid.cleaning!=null && maid.cooking!=null){
-      profileCreated = true;
+    
+    // Update the maid with new data first
+    await maid.update(data);
+    
+    // Check if all fields are filled
+    const profileCompleted = maid.name && maid.gender && maid.location &&
+      maid.govtId && maid.imageUrl && maid.timeAvailable &&
+      maid.cleaning !== null && maid.cooking !== null;
+
+    if (profileCompleted) {
+      await maid.update({ profileCreated: true });
     }
-    maid.update({profileCreated:profileCreated});
+
     return maid;
   } catch (error) {
     throw new Error("Error updating profile: " + error.message);
@@ -98,7 +104,7 @@ const verifyOtp = async (contact, code) => {
 
 const searchMaid = async (data) => {
   try {
-    const { location, slot,type } = data;
+    const { location,type } = data;
     
     const service = data.service;
 
@@ -121,24 +127,13 @@ const searchMaid = async (data) => {
     });
 
     
-    if(!data.slot || data.slot==null){
-      return maids;
-    }
-    
-    
     const filteredMaids = [];
-    // for (const maid of maids) {
-    //   const availability = maid.timeAvailable || {};
-    //   if (availability[day] && availability[day].includes(time)) {
-    //     filteredMaids.push(maid);
-    //   }
-    // }
 
     if(type==1){
       const day = "Monday";
       for (const maid of maids) {
         const availability = maid.timeAvailable || {};
-        if (availability[day] && availability[day].includes(time)) {
+        if (availability[day]) {
           filteredMaids.push(maid);
         }
       }
@@ -147,7 +142,7 @@ const searchMaid = async (data) => {
       const day = "Tuesday";
       for (const maid of maids) {
         const availability = maid.timeAvailable || {};
-        if (availability[day] && availability[day].includes(time)) {
+        if (availability[day]) {
           filteredMaids.push(maid);
         }
       }

@@ -8,8 +8,6 @@ const register = async (req, res) => {
     const user = await authService.registeruser(req.body);
     res.status(201).json({ success: true, user, message: "user registered successfully" });
   } catch (error) {
-    console.log("Received User Data:", req.body);
-    console.log(error.message);
     res.status(400).json({ success: false, message: error.message });
   }
 };
@@ -38,7 +36,6 @@ const googleauth = async (req, res) => {
 const googleCallback =  async (req, res) => {
 try {
     const { code } = req.query;
-     console.log("Before oauth2");
     // Step 1: Exchange code for Google Access Token
     const tokenResponse = await axios.post(
     "https://oauth2.googleapis.com/token",
@@ -50,7 +47,6 @@ try {
         grant_type: "authorization_code",
     }
     );
-    console.log("After oauth2");
     const { access_token, id_token } = tokenResponse.data;
 
     // Step 2: Verify the Google ID Token
@@ -74,11 +70,9 @@ try {
         await newUser.save();
         uid = newUser.id;
     }
-    console.log("Before jwt");
     // Step 3: Generate JWT Token for the user
     const token = jwt.sign({ id: uid, name, email },process.env.JWT_SECRET,{ expiresIn: "23h" } );
-    console.log(process.env.JWT_SECRET);  
-    console.log("After jwt");
+
     // Step 4: Send JWT token to the client
     // res.redirect("http://localhost:5173");
     // res.redirect(`newapp://customer-home?token=${token}`);
