@@ -11,7 +11,11 @@ const {
   getBookings,
   getBookingsById
 } = require('../src/services/maidService');
+const {
+  submitFeedback
+} = require('../src/services/feedbackService');
 
+const Feedback = require('../src/models/Feedback');
 const Maid = require('../src/models/Maid');
 const Booking = require('../src/models/Booking');
 const axios = require('axios');
@@ -20,6 +24,7 @@ const jwt = require('jsonwebtoken');
 // Mock external modules and models
 jest.mock('../src/models/Maid');
 jest.mock('../src/models/Booking');
+jest.mock('../src/models/Feedback');
 jest.mock('axios');
 
 describe('Maid Service', () => {
@@ -411,4 +416,81 @@ describe('Maid Service', () => {
     });
   });
 
+});
+
+describe('Feedback Service', () => {
+  beforeEach(() => {
+    // Clear all previous mocks before each test
+    jest.clearAllMocks();
+  });
+
+  describe('submitFeedback', () => {
+    it('should submit feedback and update maid rating', async () => {
+      const bookingId = 'booking123';
+      const maidId = 'maid123';
+      const uid = 'user123';
+      const data = { bookingId, rating: 4, review: 'Great service' };
+
+      // --- Mock Booking ---
+      Booking.findByPk.mockResolvedValue({ maidId });
+
+      // --- Mock Feedback ---
+      // Simulate that no feedback document exists yet so a new one is created.
+      Feedback.findOne.mockResolvedValue(null);
+      // Create a fake feedback document instance with a pushable array and a save() method.
+      const fakeFeedbackDoc = {
+        maidId,
+        feedback: [],
+        save: jest.fn().mockResolvedValue(true)
+      };
+      // When new Feedback is constructed, return our fake feedback document.
+      Feedback.mockImplementation(() => fakeFeedbackDoc);
+
+      // --- Mock Maid ---
+      // Start with a maid document having an initial rating and count.
+      const fakeMaidDoc = {
+        rating: 3, // current average rating
+        count: 2,  // current feedback count
+        save: jest.fn().mockResolvedValue(true)
+      };
+      Maid.findByPk.mockResolvedValue(fakeMaidDoc);
+
+      // Call the submitFeedback function
+      const result = await submitFeedback(uid, data);
+
+      // Verify Booking lookup was called with bookingId
+      expect(Booking.findByPk).toHaveBeenCalledWith(bookingId);
+
+      // Verify Feedback lookup was called with { maidId }
+      expect(Feedback.findOne).toHaveBeenCalledWith({ maidId });
+
+      // Since no feedback doc existed, a new one was created.
+      // Check that the new feedback was pushed into the feedback array.
+      expect(fakeFeedbackDoc.feedback).toHaveLength(1);
+      expect(fakeFeedbackDoc.feedback[0]).toMatchObject({
+        userId: uid,
+        rating: data.rating,
+        review: data.review
+      });
+      // Ensure the feedback document was saved.
+      expect(fakeFeedbackDoc.save).toHaveBeenCalled();
+
+      // Verify Maid lookup and rating update
+      // Calculation: totalRating = (3 * 2) + 4 = 10, new count = 3, new average = 10/3
+      expect(Maid.findByPk).toHaveBeenCalledWith(maidId);
+      expect(fakeMaidDoc.count).toBe(3);
+      expect(fakeMaidDoc.rating).toBeCloseTo(10 / 3);
+      expect(fakeMaidDoc.save).toHaveBeenCalled();
+
+      // Finally, check the returned message
+      expect(result).toEqual({ message: "Feedback submitted successfully" });
+    });
+
+    it('should throw an error if Booking.findByPk fails', async () => {
+      Booking.findByPk.mockRejectedValue(new Error("Booking error"));
+      await expect(
+        submitFeedback("user1", { bookingId: "booking1", rating: 5, review: "Awesome" })
+      ).rejects.toThrow("Error submitting feedback: Booking error");
+    });
+  });
 });
