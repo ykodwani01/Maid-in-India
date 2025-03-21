@@ -192,7 +192,7 @@ const bookingConfirm = async (bookingId,cost) => {
     if (!booking) {
       throw new Error("Booking not found");
     }
-    await booking.update({paymentStatus:true});
+    await booking.update({paymentStatus:true,cost:cost});
     const maidId = booking.maidId;
     const maid = await Maid.findByPk(maidId);
 
@@ -200,8 +200,6 @@ const bookingConfirm = async (bookingId,cost) => {
       const time = booking.slot[day];
       maid.timeAvailable[day] = maid.timeAvailable[day].filter(slot => slot !== time);
     }
-    booking.cost = cost;
-    await booking.save();
     maid.changed('timeAvailable', true);
 
     // Save the changes to the database
@@ -243,12 +241,18 @@ const cancelBooking = async(uid,data) => {
 const getBookings = async(uid) => {
   try{
     const bookings = await Booking.findAll({
-      where:{
-        userId:uid, 
-        paymentStatus : true
+      where: {
+          userId: uid,
+          paymentStatus: true
       }
     });
-    return bookings;
+
+    const bookingsWithMaid = await Promise.all(bookings.map(async (booking) => {
+      const maid = await Maid.findOne({ where: { maidId: booking.maidId } });
+      return { ...booking.toJSON(), maidName: maid ? maid.name : null , maidContact: maid ? maid.contact : null};
+    }));
+
+    return bookingsWithMaid;
   }
   catch(error){
     throw new Error("Error fetching bookings: " + error.message);
