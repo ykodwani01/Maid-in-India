@@ -186,7 +186,7 @@ const createBooking = async(data,userId) => {
   }
 };
 
-const bookingConfirm = async (bookingId) => {
+const bookingConfirm = async (bookingId,cost) => {
   try {
     const booking = await Booking.findByPk(bookingId);
     if (!booking) {
@@ -200,7 +200,8 @@ const bookingConfirm = async (bookingId) => {
       const time = booking.slot[day];
       maid.timeAvailable[day] = maid.timeAvailable[day].filter(slot => slot !== time);
     }
-
+    booking.cost = cost;
+    await booking.save();
     maid.changed('timeAvailable', true);
 
     // Save the changes to the database
