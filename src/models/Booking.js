@@ -38,6 +38,12 @@ const Booking = sequelize.define('Booking', {
     },
     cost : {
         type : DataTypes.INTEGER
+    },
+    userLocation : {
+      type : DataTypes.INTEGER
+  },
+    userContact : {
+      type : DataTypes.INTEGER
     }
   }, {
     tableName: 'bookings',

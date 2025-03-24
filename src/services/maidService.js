@@ -186,20 +186,19 @@ const createBooking = async(data,userId) => {
   }
 };
 
-const bookingConfirm = async (bookingId,cost,location) => {
+const bookingConfirm = async (bookingId,cost,location,contact) => {
   try {
     const booking = await Booking.findByPk(bookingId);
     if (!booking) {
       throw new Error("Booking not found");
     }
-    await booking.update({paymentStatus:true,cost:cost});
-    const uid = booking.userId;
-    const user = await User.findOne({ _id: uid });
+    await booking.update({paymentStatus:true,cost:cost,userLocation:location,userContact:contact});
     const maidId = booking.maidId;
-    const maid = await Maid.findByPk(maidId);
-    
-    user.location = location;
-    await user.save();
+    const maid = await Maid.findByPk(maidId); 
+    // const uid = booking.userId;
+    // const user = await User.findOne({ _id: uid });
+    // user.location = location;
+    // await user.save();
     for (const day in booking.slot) {
       const time = booking.slot[day];
       maid.timeAvailable[day] = maid.timeAvailable[day].filter(slot => slot !== time);

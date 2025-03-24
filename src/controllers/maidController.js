@@ -64,7 +64,8 @@ const confirmBooking = async (req, res) => {
     const bookingId = req.body.bookingId;
     const cost = req.body.cost;
     const location = req.body.userLocation;
-    const result = await maidService.bookingConfirm(bookingId,cost,location);
+    const contact = req.body.userContact
+    const result = await maidService.bookingConfirm(bookingId,cost,location,contact);
     return res.status(200).json(result);
   } catch(error){
     console.error('Error in confirmBooking:', error);
