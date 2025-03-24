@@ -280,9 +280,12 @@ const getAllLocation = async() => {
     const maids = await Maid.findAll();
     const location = new Set();
     for(const maid of maids){
+      console.log(maid.location);
       location.add(maid.location);
     }
-    return location;
+    const array = Array.from(location);
+    return array;
+    // return location.values();
   }
   catch(error){
     throw new Error("Error fetching locations: " + error.message);

@@ -16,5 +16,5 @@ maidRoutes.get("/bookings", authMiddleware,maidController.getBookings);
 maidRoutes.get("/bookings/:id", authMiddleware,maidController.getBookingsById);
 maidRoutes.post("/feedback", authMiddleware,feedbackController.submitFeedback);
 maidRoutes.get("/feedback/:id", authMiddleware,feedbackController.getFeedbackById);
-maidRoutes.get("/available-locations", authMiddleware,maidController.getAllLocation);
+maidRoutes.get("/available-locations",authMiddleware,maidController.getAllLocation);
 module.exports = maidRoutes;
