@@ -275,6 +275,18 @@ const getBookingsById = async(uid,bookingId) => {
   }
 };
 
+const getAllLocation = async() => {
+  try{
+    const maids = await Maid.findAll();
+    const location = new Set();
+    for(const maid of maids){
+      location.add(maid.location);
+    }
+    return location;
+  }
+  catch(error){
+    throw new Error("Error fetching locations: " + error.message);
+  }
+};
 
-
-module.exports = {getProfile,updateProfile,verifyOtp,sendOtp,createBooking,searchMaid,bookingConfirm,cancelBooking,getBookings,getBookingsById};
+module.exports = {getProfile,updateProfile,verifyOtp,sendOtp,createBooking,searchMaid,bookingConfirm,cancelBooking,getBookings,getBookingsById,getAllLocation};

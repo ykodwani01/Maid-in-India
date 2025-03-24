@@ -119,5 +119,13 @@ const getBookingsById = async (req,res) => {
     return res.status(500).json({ message: 'Server error'});
   }
 };
-
-module.exports = {getProfile,updateProfile, sendOtp, verifyOtp, bookMaid,searchMaid,confirmBooking,cancelBooking,getBookings,getBookingsById};
+const getAllLocation = async (req,res) => {
+  try {
+    const locations = await maidService.getAllLocation();
+    return res.status(200).json(locations);
+  } catch (error) {
+    console.error('Error in getAllLocation:', error);
+    return res.status(500).json({ message: 'Server error' });
+  }
+}
+module.exports = {getProfile,updateProfile, sendOtp, verifyOtp, bookMaid,searchMaid,confirmBooking,cancelBooking,getBookings,getBookingsById,getAllLocation};
