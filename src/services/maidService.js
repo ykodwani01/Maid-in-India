@@ -280,7 +280,6 @@ const getAllLocation = async() => {
     const maids = await Maid.findAll();
     const location = new Set();
     for(const maid of maids){
-      console.log(maid.location);
       location.add(maid.location);
     }
     const array = Array.from(location);

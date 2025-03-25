@@ -9,10 +9,12 @@ const getSchedule = async (uid) => {
         for (const booking of bookings){
             const user = await User.findOne({ _id: booking.userId });
             const userName = user.name;
-            const userContact = user.contactNumber || "Not available";
-            const userLocation = user.location || "Not available";
+            const userContact = booking.userContact || "Not available";
+            const userLocation = booking.userLocation || "Not available";
             const slot = booking.slot;
-            data.push({ userName, userContact, userLocation, slot });
+            const service = booking.service;
+            const cost = booking.cost;
+            data.push({ userName, userContact, userLocation, slot, service, cost });
         }
         return data;
     } catch (error) {
