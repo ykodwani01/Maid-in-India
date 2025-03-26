@@ -12,6 +12,4 @@ const schedule = async (req,res) => {
     }
 };
 
-
-
 module.exports = {schedule};

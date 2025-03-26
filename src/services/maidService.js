@@ -6,6 +6,7 @@ const otpGenerator = require("otp-generator");
 const twilio = require("twilio");
 const Booking = require('../models/Booking');
 const { Op } = require('sequelize');
+const workService = require('../services/workService');
 
 const getProfile = async (maidId) => {
   try {
@@ -207,6 +208,7 @@ const bookingConfirm = async (bookingId,cost,location,contact) => {
 
     // Save the changes to the database
     await maid.save();
+    workService.scheduleReminderJob(booking);
     return booking;
   } catch (error) {
     throw new Error("Error confirming booking: " + error.message);
@@ -235,6 +237,7 @@ const cancelBooking = async(uid,data) => {
     // Save the changes to the database
       await maid.save();
       await booking.destroy();
+      await workService.cancelReminderJob(bookingId);
     }
     catch(error){
       throw new Error("Error cancelling booking: " + error.message);
