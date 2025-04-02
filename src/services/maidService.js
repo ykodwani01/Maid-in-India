@@ -1,5 +1,5 @@
 const Maid = require('../models/Maid');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const otpGenerator = require("otp-generator");
