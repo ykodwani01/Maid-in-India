@@ -4,10 +4,22 @@ on:
   push:
     branches:
       - main  # or change to your branch name
-
 jobs:
   test-and-build:
     runs-on: ubuntu-latest
+    
+    env:
+      MONGODB_URI: ${{ secrets.MONGODB_URI }}
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      NEON_PG_CONNECTION_STRING: ${{ secrets.NEON_PG_CONNECTION_STRING }}
+      GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+      GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+      GOOGLE_CALLBACK_URL: ${{ secrets.GOOGLE_CALLBACK_URL }}
+      TWILIO_SID: ${{ secrets.TWILIO_SID }}
+      TWILIO_AUTH_TOKEN: ${{ secrets.TWILIO_AUTH_TOKEN }}
+      VERIFY_SERVICE_SID: ${{ secrets.VERIFY_SERVICE_SID }}
+      accountSid: ${{ secrets.accountSid }} # reuse same secret if needed
+      authToken: ${{ secrets.TWILIO_AUTH_TOKEN }}
 
     steps:
       # Checkout the code
