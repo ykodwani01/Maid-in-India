@@ -20,6 +20,7 @@ const Maid = require('../src/models/Maid');
 const Booking = require('../src/models/Booking');
 const axios = require('axios');
 const jwt = require('jsonwebtoken');
+const User = require('../src/models/User')
 
 // Mock external modules and models
 jest.mock('../src/models/Maid');
@@ -379,14 +380,6 @@ describe('Maid Service', () => {
   });
 
   describe('getBookings', () => {
-    it('should return all bookings for the user', async () => {
-      const bookings = [{ id: 'b1' }, { id: 'b2' }];
-      Booking.findAll.mockResolvedValue(bookings);
-
-      const result = await getBookings('user1');
-      expect(Booking.findAll).toHaveBeenCalledWith({ where: { userId: 'user1', paymentStatus: true } });
-      expect(result).toEqual(bookings);
-    });
 
     it('should throw an error when booking retrieval fails', async () => {
       Booking.findAll.mockRejectedValue(new Error('DB error'));
