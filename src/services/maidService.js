@@ -30,7 +30,7 @@ const updateProfile = async(id,data) => {
     await maid.update(data);
     
     // Check if all fields are filled
-    const profileCompleted = maid.name && maid.gender && maid.location &&
+    const profileCompleted = maid.name && maid.gender && maid.location && maid.latitude !== null && maid.longitude !== null &&
       maid.govtId && maid.imageUrl && maid.timeAvailable &&
       maid.cleaning !== null && maid.cooking !== null;
 
@@ -105,11 +105,10 @@ const verifyOtp = async (contact, code) => {
 
 const searchMaid = async (data) => {
   try {
-    const { location,type } = data;
-    
-    const service = data.service;
+    const { location, type, service, latitude, longitude, radius = 5 } = data;
+    console.log(data);
 
-    let whereClause = { location: location };
+    let whereClause = {};
     if (service === "cleaning") {
       whereClause.cleaning = "true";
     } else if (service === "cooking") {
@@ -123,8 +122,52 @@ const searchMaid = async (data) => {
       //if service is null search only by location
     }
 
+    if (latitude && longitude) {
+      // Using Sequelize's raw SQL for Haversine formula calculation
+      // This calculates distance in kilometers
+      const haversine = `
+        (
+          6371 * acos(
+            cos(radians(${latitude})) * 
+            cos(radians(latitude)) * 
+            cos(radians(longitude) - radians(${longitude})) + 
+            sin(radians(${latitude})) * 
+            sin(radians(latitude))
+          )
+        )
+      `;
+      
+      // Include this in our query to find maids within the given radius
+      whereClause = {
+        ...whereClause,
+        [Op.and]: sequelize.literal(`${haversine} <= ${radius}`)
+      };
+    } 
+
     const maids = await Maid.findAll({
-      where: whereClause
+      where: whereClause,
+      // If using coordinates, order by distance
+      ...(latitude && longitude && {
+        attributes: {
+          include: [
+            [
+              sequelize.literal(`
+                (
+                  6371 * acos(
+                    cos(radians(${latitude})) * 
+                    cos(radians(latitude)) * 
+                    cos(radians(longitude) - radians(${longitude})) + 
+                    sin(radians(${latitude})) * 
+                    sin(radians(latitude))
+                  )
+                )
+              `), 
+              'distance'
+            ]
+          ]
+        },
+        order: sequelize.literal('distance ASC')
+      })
     });
 
     
@@ -151,7 +194,7 @@ const searchMaid = async (data) => {
     else{
       for (const maid of maids) {
         const availability = maid.timeAvailable || {};
-        if ((availability["Monday"]) || (availability["Tuesday"])) {
+        if ((availability["Monday"]) && (availability["Tuesday"])) {
           filteredMaids.push(maid);
         }
       }

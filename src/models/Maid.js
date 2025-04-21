@@ -30,6 +30,14 @@ const Maid = sequelize.define('Maid', {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  latitude: {
+    type: DataTypes.FLOAT,
+    allowNull: true,
+  },
+  longitude: {
+    type: DataTypes.FLOAT,
+    allowNull: true,
+  },
   govtId: {
     type: DataTypes.STRING,
     allowNull: true,
