@@ -7,6 +7,7 @@ const twilio = require("twilio");
 const Booking = require('../models/Booking');
 const { Op } = require('sequelize');
 const workService = require('../services/workService');
+const { sequelize } = require('../config/db_pg');  
 
 const getProfile = async (maidId) => {
   try {

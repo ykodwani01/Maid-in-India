@@ -10,7 +10,7 @@ maidRoutes.post("/verify-otp", maidController.verifyOtp);
 maidRoutes.post("/send-otp", maidController.sendOtp);
 maidRoutes.post("/book", authMiddleware,maidController.bookMaid);
 maidRoutes.post("/cancel-booking", authMiddleware,maidController.cancelBooking);
-maidRoutes.post("/search", authMiddleware,maidController.searchMaid);
+maidRoutes.post("/search",maidController.searchMaid);
 maidRoutes.post("/confirm-booking",maidController.confirmBooking);
 maidRoutes.get("/bookings", authMiddleware,maidController.getBookings);
 maidRoutes.get("/bookings/:id", authMiddleware,maidController.getBookingsById);
