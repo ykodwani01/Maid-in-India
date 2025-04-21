@@ -28,6 +28,7 @@ const updateProfile = async(id,data) => {
     
     // Update the maid with new data first
     await maid.update(data);
+    console.log(data);
     
     // Check if all fields are filled
     const profileCompleted = maid.name && maid.gender && maid.location && maid.latitude !== null && maid.longitude !== null &&
