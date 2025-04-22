@@ -110,7 +110,7 @@ const searchMaid = async (data) => {
     const { location, type, service, latitude, longitude, radius = 5 } = data;
     console.log(data);
 
-    let whereClause = {};
+    let whereClause = {whereClause.profileCreated="true"};
     if (service === "cleaning") {
       whereClause.cleaning = "true";
     } else if (service === "cooking") {
