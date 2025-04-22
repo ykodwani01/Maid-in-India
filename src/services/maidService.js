@@ -229,7 +229,8 @@ const bookingConfirm = async (bookingId,cost,location) => {
       }
     }
     // Update the booking with payment status and other details
-    const user = User.findOne({email});
+    const userId = booking.userId;
+    const user = await User.findOne({_id:userId});
     const contact = user.contactNumber;
     console.log(contact);
     await booking.update({paymentStatus:true,cost:cost,userLocation:location,userContact:contact});
