@@ -33,7 +33,7 @@ const updateProfile = async(id,data) => {
     
     // Check if all fields are filled
     const profileCompleted = maid.name && maid.gender && maid.location && maid.latitude !== null && maid.longitude !== null &&
-      maid.govtId && maid.imageUrl && maid.timeAvailable &&
+      maid.govtId  && maid.timeAvailable &&
       maid.cleaning !== null && maid.cooking !== null;
 
     if (profileCompleted) {
@@ -147,29 +147,7 @@ const searchMaid = async (data) => {
     } 
 
     const maids = await Maid.findAll({
-      where: whereClause,
-      // If using coordinates, order by distance
-      ...(latitude && longitude && {
-        attributes: {
-          include: [
-            [
-              sequelize.literal(`
-                (
-                  6371 * acos(
-                    cos(radians(${latitude})) * 
-                    cos(radians(latitude)) * 
-                    cos(radians(longitude) - radians(${longitude})) + 
-                    sin(radians(${latitude})) * 
-                    sin(radians(latitude))
-                  )
-                )
-              `), 
-              'distance'
-            ]
-          ]
-        },
-        order: sequelize.literal('distance ASC')
-      })
+      where: whereClause
     });
 
     
@@ -232,19 +210,29 @@ const createBooking = async(data,userId) => {
   }
 };
 
-const bookingConfirm = async (bookingId,cost,location,contact) => {
+const bookingConfirm = async (bookingId,cost,location) => {
   try {
     const booking = await Booking.findByPk(bookingId);
     if (!booking) {
       throw new Error("Booking not found");
     }
-    await booking.update({paymentStatus:true,cost:cost,userLocation:location,userContact:contact});
+    
     const maidId = booking.maidId;
     const maid = await Maid.findByPk(maidId); 
-    // const uid = booking.userId;
-    // const user = await User.findOne({ _id: uid });
-    // user.location = location;
-    // await user.save();
+
+    for (const day in booking.slot) {
+      const time = booking.slot[day];
+      if (!maid.timeAvailable[day] || !maid.timeAvailable[day].includes(time)) {
+        throw new Error(`Maid not available on ${day} at ${time}`);
+      }
+    }
+    // Update the booking with payment status and other details
+    const user = User.findOne({email});
+    const contact = user.contactNumber;
+    console.log(contact);
+    await booking.update({paymentStatus:true,cost:cost,userLocation:location,userContact:contact});
+    
+    
     for (const day in booking.slot) {
       const time = booking.slot[day];
       maid.timeAvailable[day] = maid.timeAvailable[day].filter(slot => slot !== time);

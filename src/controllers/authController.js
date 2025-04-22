@@ -21,6 +21,26 @@ const login = async (req, res) => {
     res.status(401).json({ success: false, message: error.message });
   }
 };
+const getProfile = async (req, res) => {
+  try {
+    const uid = req.user.id;
+    const data = await authService.getProfile(uid);
+    res.status(200).json({ success: true, data });
+  } catch (error) {
+    res.status(401).json({ success: false, message: error.message });
+  }
+};
+
+const updateProfile = async (req, res) => {
+  try {
+    const uid = req.user.id;
+    const data = await authService.updateProfile(uid,req.body);
+    res.status(200).json({ success: true, data });
+
+  } catch (error) {
+    res.status(401).json({ success: false, message: error.message });
+  }
+};
 
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
@@ -63,7 +83,7 @@ try {
         const newUser = new User({ 
             name, 
             email, 
-            location: "Ahmedabad", 
+            address: "Ahmedabad", 
             password: "GoogleAuthHenceNoPasswordSecretKey@123456"
         });
 
@@ -93,4 +113,4 @@ const verifyGoogle = async (req,res) => {
     res.status(400).json({success: false, message: error.message});
   }
 };
-module.exports = { register, login, googleauth, googleCallback , verifyGoogle};
+module.exports = { register, login, googleauth, googleCallback ,updateProfile, verifyGoogle, getProfile};
