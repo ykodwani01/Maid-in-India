@@ -49,7 +49,7 @@ const updateProfile = async(uid,data) => {
   user.address = address || user.address ;
   user.profileCreated=true;
   await user.save();
-  return { name: user.name, contactNumber: user.contactNumber, address: user.address, profileCreated };
+  return { name: user.name, contactNumber: user.contactNumber, address: user.address, user.profileCreated };
 };
 
 const verifyGoogle = async (data) => {
