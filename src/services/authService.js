@@ -75,7 +75,7 @@ const verifyGoogle = async (data) => {
       process.env.JWT_SECRET,
       { expiresIn: "23h" }
     );
-    return { id: user._id, name, token: jwtToken, email, picture, profileCreated:user.profileCreated };
+    return { id: user._id, name:user.name, token: jwtToken, email, picture, profileCreated:user.profileCreated };
   } catch (error) {
     console.error('Error in verifyGoogleService:', error);
     throw error; // rethrow error to let the route handler catch it
