@@ -37,7 +37,7 @@ const loginuser = async ({ email, password }) => {
 const getProfile = async(uid) => {
   const user = await User.findById(uid);
   if (!user) throw new Error("User not found");
-  return { id: user._id, name: user.name, contact: user.contactNumber, address: user.address };
+  return { id: user._id, name: user.name, contact: user.contactNumber, address: user.address, profileCreated:user.profileCreated };
 }
 
 const updateProfile = async(uid,data) => {
@@ -47,8 +47,9 @@ const updateProfile = async(uid,data) => {
   user.name = name || user.name ;
   user.contactNumber = contactNumber || user.contactNumber;
   user.address = address || user.address ;
+  user.profileCreated=true;
   await user.save();
-  return { name: user.name, contactNumber: user.contactNumber, address: user.address };
+  return { name: user.name, contactNumber: user.contactNumber, address: user.address, profileCreated };
 };
 
 const verifyGoogle = async (data) => {
@@ -74,7 +75,7 @@ const verifyGoogle = async (data) => {
       process.env.JWT_SECRET,
       { expiresIn: "23h" }
     );
-    return { id: user._id, name, token: jwtToken, email, picture };
+    return { id: user._id, name, token: jwtToken, email, picture, profileCreated };
   } catch (error) {
     console.error('Error in verifyGoogleService:', error);
     throw error; // rethrow error to let the route handler catch it
