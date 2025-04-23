@@ -65,7 +65,7 @@ const verifyGoogle = async (data) => {
     
     let user = await User.findOne({ email });
     if (!user) {
-      user = new User({ name, email, password: "GoogleAuthHenceNoPasswordSecretKey@123456" });
+      user = new User({ name, email, password: "GoogleAuthHenceNoPasswordSecretKey@123456" ,profileCreated:false});
       await user.save();
     }
     
@@ -75,7 +75,7 @@ const verifyGoogle = async (data) => {
       process.env.JWT_SECRET,
       { expiresIn: "23h" }
     );
-    return { id: user._id, name, token: jwtToken, email, picture, profileCreated };
+    return { id: user._id, name, token: jwtToken, email, picture, profileCreated:user.profileCreated };
   } catch (error) {
     console.error('Error in verifyGoogleService:', error);
     throw error; // rethrow error to let the route handler catch it
