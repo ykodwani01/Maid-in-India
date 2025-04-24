@@ -9,6 +9,7 @@ maidRoutes.put("/profile", authMiddleware,maidController.updateProfile);
 maidRoutes.post("/verify-otp", maidController.verifyOtp);
 maidRoutes.post("/send-otp", maidController.sendOtp);
 maidRoutes.post("/book", authMiddleware,maidController.bookMaid);
+maidRoutes.post("/get-soft", authMiddleware,maidController.getSoftBookings);
 maidRoutes.post("/cancel-booking", authMiddleware,maidController.cancelBooking);
 maidRoutes.post("/search",authMiddleware,maidController.searchMaid);
 maidRoutes.post("/confirm-booking",maidController.confirmBooking);

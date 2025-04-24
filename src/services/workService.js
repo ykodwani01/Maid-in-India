@@ -97,6 +97,20 @@ const cancelReminderJob = async(bookingId) => {
       console.log(`No scheduled job found for booking ${bookingId}`);
     }
 }
-
+const deleteStaleSoftBookings = async () => {
+    const currentTime = moment();
+    const bookings = await Booking.findAll({ where: { paymentStatus: "soft-booked" } });
+    for (const booking of bookings) {
+        const createdAt = moment(booking.created_at);
+        const diffInMinutes = currentTime.diff(createdAt, 'minutes');
+        if (diffInMinutes > 5) {
+            await booking.destroy();
+            console.log(`Deleted stale booking with ID: ${booking.BookingId}`);
+        }
+    }
+}
+cron.schedule('* * * * *', () => {
+    deleteStaleSoftBookings();
+});
 
 module.exports = { getSchedule,scheduleReminderJob, cancelReminderJob };

@@ -34,7 +34,7 @@ const Booking = sequelize.define('Booking', {
       allowNull : true
     },
     paymentStatus : {
-        type : DataTypes.BOOLEAN
+        type : DataTypes.STRING
     },
     cost : {
         type : DataTypes.INTEGER

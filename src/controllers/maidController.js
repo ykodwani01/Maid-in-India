@@ -80,7 +80,7 @@ const bookMaid = async (req,res) => {
     return res.status(200).json(booking);
   } catch (error) {
     console.error('Error in bookMaid:', error);
-    return res.status(500).json({ message: 'Server error' });
+    return res.status(500).json({ message: error.message});
   }
 };
 
@@ -127,4 +127,14 @@ const getAllLocation = async (req,res) => {
     return res.status(500).json({ message: 'Server error' });
   }
 }
-module.exports = {getProfile,updateProfile, sendOtp, verifyOtp, bookMaid,searchMaid,confirmBooking,cancelBooking,getBookings,getBookingsById,getAllLocation};
+const getSoftBookings = async (req,res) => {
+  try {
+    const maidId = req.body.maidId;
+    const bookings = await maidService.getSoftBookedSlotsByMaid(maidId);
+    return res.status(200).json(bookings);
+  } catch (error) {
+    console.error('Error in getSoftBookings:', error);
+    return res.status(500).json({ message: 'Server error' });
+  }
+}
+module.exports = {getProfile,updateProfile, sendOtp, verifyOtp, getSoftBookings,bookMaid,searchMaid,confirmBooking,cancelBooking,getBookings,getBookingsById,getAllLocation};

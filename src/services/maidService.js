@@ -154,7 +154,7 @@ const searchMaid = async (data) => {
 
     
     const filteredMaids = [];
-
+    
     if(type==1){
       const day = "Monday";
       for (const maid of maids) {
@@ -190,7 +190,8 @@ const searchMaid = async (data) => {
 
 const createBooking = async(data,userId) => {
   try {
-    const {maidId,slot,type,service} = data;
+    const {maidId,type,service} = data;
+    let slot = data.slot;
     const maid = await Maid.findByPk(maidId);
     
     let time = {};
@@ -203,9 +204,18 @@ const createBooking = async(data,userId) => {
     else{
       time = {"Monday":slot, "Tuesday":slot, "Wednesday" : slot, "Thursday" : slot, "Friday" : slot, "Saturday" : slot, "Sunday" :slot};
     }
-
-
-    const booking = await Booking.create({maidId,userId,slot:time,paymentStatus:false,service});
+    slot=time;
+    const existingBooking = await Booking.findOne({
+      where: {
+        maidId,
+        slot,
+        paymentStatus: { [Op.in]: ['soft-booked', 'confirmed'] },
+      },
+    });
+    if (existingBooking) {
+      throw new Error("Soft booked or confirmed booking already exists for this maid and time slot");
+    }
+    const booking = await Booking.create({maidId,userId,slot:time,paymentStatus:"soft-booked",service});
     return booking;
   } catch (error) {
     throw new Error("Error creating booking: " + error.message);
@@ -228,12 +238,15 @@ const bookingConfirm = async (bookingId,cost,location) => {
         throw new Error(`Maid not available on ${day} at ${time}`);
       }
     }
+    if(booking.paymentStatus !== "soft-booked"){
+      throw new Error("Booking is not in soft-booked status");
+    }
     // Update the booking with payment status and other details
     const userId = booking.userId;
     const user = await User.findOne({_id:userId});
     const contact = user.contactNumber;
     console.log(contact);
-    await booking.update({paymentStatus:true,cost:cost,userLocation:location,userContact:contact});
+    await booking.update({paymentStatus:"confirmed",cost:cost,userLocation:location,userContact:contact});
     
     
     for (const day in booking.slot) {
@@ -285,7 +298,7 @@ const getBookings = async(uid) => {
     const bookings = await Booking.findAll({
       where: {
           userId: uid,
-          paymentStatus: true
+          paymentStatus: "confirmed"
       }
     });
 
@@ -330,4 +343,37 @@ const getAllLocation = async() => {
   }
 };
 
-module.exports = {getProfile,updateProfile,verifyOtp,sendOtp,createBooking,searchMaid,bookingConfirm,cancelBooking,getBookings,getBookingsById,getAllLocation};
+const getSoftBookedSlotsByMaid = async(maidId) => {
+  try {
+    const bookings = await Booking.findAll({
+      where: {
+        maidId: maidId,
+        paymentStatus: 'soft-booked'
+      },
+      attributes: ['slot']
+    });
+
+    const mergedSlotMap = {};
+
+    bookings.forEach(b => {
+      const slot = b.slot;
+      if (!slot || typeof slot !== 'object') return;
+
+      for (const [day, time] of Object.entries(slot)) {
+        if (time && !mergedSlotMap[day]) {
+          mergedSlotMap[day] = time;
+        }
+      }
+    });
+
+    return {
+      [maidId]: mergedSlotMap
+    };
+
+  } catch (err) {
+    console.error('Error fetching soft booked slot map:', err);
+    return { [maidId]: {} };
+  }
+}
+
+module.exports = {getProfile,updateProfile,verifyOtp,sendOtp,getSoftBookedSlotsByMaid,createBooking,searchMaid,bookingConfirm,cancelBooking,getBookings,getBookingsById,getAllLocation};
