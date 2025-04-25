@@ -137,4 +137,14 @@ const getSoftBookings = async (req,res) => {
     return res.status(500).json({ message: 'Server error' });
   }
 }
-module.exports = {getProfile,updateProfile, sendOtp, verifyOtp, getSoftBookings,bookMaid,searchMaid,confirmBooking,cancelBooking,getBookings,getBookingsById,getAllLocation};
+const deleteSoftBooking = async (req,res) => {
+  try {
+    const bookingId = req.body.bookingId;
+    const bookings = await maidService.deleteSoftBooking(bookingId);
+    return res.status(200).json(bookings);
+  } catch (error) {
+    console.error('Error in deleteSoftBookings:', error);
+    return res.status(500).json({ message: 'Server error' });
+  }
+}
+module.exports = {getProfile,updateProfile, sendOtp, verifyOtp, deleteSoftBooking,getSoftBookings,bookMaid,searchMaid,confirmBooking,cancelBooking,getBookings,getBookingsById,getAllLocation};

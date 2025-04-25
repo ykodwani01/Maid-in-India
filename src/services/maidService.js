@@ -374,4 +374,22 @@ const getSoftBookedSlotsByMaid = async (maidId) => {
   }
 };
 
-module.exports = {getProfile,updateProfile,verifyOtp,sendOtp,getSoftBookedSlotsByMaid,createBooking,searchMaid,bookingConfirm,cancelBooking,getBookings,getBookingsById,getAllLocation};
+const deleteSoftBooking = async (bookingId) => {
+  try {
+    const bookings = await Booking.findAll({
+      where: {
+        bookingId: bookingId,
+        paymentStatus: 'soft-booked'
+      },
+      attributes: ['slot']
+    });
+
+    for (const booking of bookings) {
+      await booking.destroy();
+    }
+  } catch (error) {
+    throw new Error("Error deleting soft booking: " + error.message);
+  }
+};
+
+module.exports = {getProfile,updateProfile,verifyOtp,sendOtp,deleteSoftBooking, getSoftBookedSlotsByMaid,createBooking,searchMaid,bookingConfirm,cancelBooking,getBookings,getBookingsById,getAllLocation};

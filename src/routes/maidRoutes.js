@@ -17,4 +17,5 @@ maidRoutes.get("/bookings", authMiddleware,maidController.getBookings);
 maidRoutes.get("/bookings/:id", authMiddleware,maidController.getBookingsById);
 maidRoutes.post("/feedback", authMiddleware,feedbackController.submitFeedback);
 maidRoutes.get("/available-locations",authMiddleware,maidController.getAllLocation);
+maidRoutes.post("/delete-soft", authMiddleware,maidController.deleteSoftBooking);
 module.exports = maidRoutes;
