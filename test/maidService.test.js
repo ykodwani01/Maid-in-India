@@ -328,7 +328,7 @@ describe('Maid Service', () => {
       Maid.findByPk.mockResolvedValue(maidObj);
 
       const result = await bookingConfirm('b1');
-      expect(bookingObj.update).toHaveBeenCalledWith({ paymentStatus: true });
+      expect(bookingObj.update).toHaveBeenCalledWith({ paymentStatus: "confirmed" });
       expect(maidObj.timeAvailable.Monday).toEqual(['9AM', '11AM']);
       expect(maidObj.changed).toHaveBeenCalledWith('timeAvailable', true);
       expect(maidObj.save).toHaveBeenCalled();

@@ -6,7 +6,7 @@ const moment = require("moment");
 
 const getSchedule = async (uid) => {
     try {
-        const bookings = await Booking.findAll({ where: { maidId: uid, paymentStatus:true} });
+        const bookings = await Booking.findAll({ where: { maidId: uid, paymentStatus:"confirmed"} });
         //user name, user contact, user address, booking time, booking date
         let data = [];
         for (const booking of bookings){
