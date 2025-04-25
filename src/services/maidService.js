@@ -376,12 +376,12 @@ const getSoftBookedSlotsByMaid = async (maidId) => {
 
 const deleteSoftBooking = async (bookingId) => {
   try {
+    // console.log(bookingId);
     const bookings = await Booking.findAll({
       where: {
         BookingId: bookingId,
         paymentStatus: 'soft-booked'
-      },
-      attributes: ['slot']
+      }
     });
 
     for (const booking of bookings) {

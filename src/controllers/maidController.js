@@ -140,6 +140,7 @@ const getSoftBookings = async (req,res) => {
 const deleteSoftBooking = async (req,res) => {
   try {
     const bookingId = req.body.bookingId;
+    console.log(bookingId);
     const bookings = await maidService.deleteSoftBooking(bookingId);
     return res.status(200).json(bookings);
   } catch (error) {
