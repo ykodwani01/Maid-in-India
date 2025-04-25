@@ -378,7 +378,7 @@ const deleteSoftBooking = async (bookingId) => {
   try {
     const bookings = await Booking.findAll({
       where: {
-        bookingId: bookingId,
+        BookingId: bookingId,
         paymentStatus: 'soft-booked'
       },
       attributes: ['slot']
