@@ -14,7 +14,7 @@ const registeruser = async (userData) => {
   const hashedPassword = await bcrypt.hash(password, 10);
 
   // Create new user entry
-  user = new User({ name, contactNumber, password: hashedPassword , address,email});
+  user = new User({ name, role:'user',contactNumber, password: hashedPassword , address,email});
   await user.save();
 
   return { id: user._id, name: user.name, contactNumber: user.contactNumber, email : user.email};
@@ -30,7 +30,7 @@ const loginuser = async ({ email, password }) => {
   if (!isMatch) throw new Error("Invalid credentials");
 
   // Generate JWT token
-  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "23h" });
+  const token = jwt.sign({ id: user._id , role:"user"}, process.env.JWT_SECRET, { expiresIn: "23h" });
 
   return { token, user: { id: user._id} };
 };
@@ -65,17 +65,17 @@ const verifyGoogle = async (data) => {
     
     let user = await User.findOne({ email });
     if (!user) {
-      user = new User({ name, email, password: "GoogleAuthHenceNoPasswordSecretKey@123456" ,profileCreated:false});
+      user = new User({ name, email, role:'user',password: "GoogleAuthHenceNoPasswordSecretKey@123456" ,profileCreated:false});
       await user.save();
     }
     
     // Issue JWT using the user's _id (or id from the database)
     const jwtToken = jwt.sign(
-      { id: user._id, name, email },
+      { id: user._id, name, email, role: user.role || 'user' },
       process.env.JWT_SECRET,
       { expiresIn: "23h" }
     );
-    return { id: user._id, name:user.name, token: jwtToken, email, picture, profileCreated:user.profileCreated };
+    return { id: user._id, role:user.role || 'user',name:user.name, token: jwtToken, email, picture, profileCreated:user.profileCreated };
   } catch (error) {
     console.error('Error in verifyGoogleService:', error);
     throw error; // rethrow error to let the route handler catch it

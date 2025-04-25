@@ -13,6 +13,7 @@ const authMiddleware = (req, res, next) => {
     const token = authHeader.split(" ")[1]; // Extract token after 'Bearer'
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    console.log(decoded);
     req.user = decoded;
     
     next(); // Proceed to the next middleware/controller
@@ -22,4 +23,14 @@ const authMiddleware = (req, res, next) => {
   }
 };
 
-module.exports = authMiddleware;
+const allowRoles = (...roles) => {
+  return (req, res, next) => {
+    console.log(`User Role: ${req.user.role}`);
+    if (!roles.includes(req.user.role)) {
+      return res.status(403).send('Access denied');
+    }
+    next();
+  };
+};
+
+module.exports = {authMiddleware,allowRoles};

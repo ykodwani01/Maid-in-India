@@ -113,4 +113,6 @@ cron.schedule('* * * * *', () => {
     deleteStaleSoftBookings();
 });
 
+
+
 module.exports = { getSchedule,scheduleReminderJob, cancelReminderJob };
