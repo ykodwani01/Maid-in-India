@@ -92,7 +92,7 @@ try {
         uid = newUser.id;
     }
     // Step 3: Generate JWT Token for the user
-    const token = jwt.sign({ id: uid, role:"user" , name, email },process.env.JWT_SECRET,{ expiresIn: "23h" } );
+    const token = jwt.sign({ id: uid, role: user?.role || 'user', name, email },process.env.JWT_SECRET,{ expiresIn: "23h" } );
 
     // Step 4: Send JWT token to the client
     // res.redirect("http://localhost:5173");
