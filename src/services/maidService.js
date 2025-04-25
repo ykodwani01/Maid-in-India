@@ -343,7 +343,7 @@ const getAllLocation = async() => {
   }
 };
 
-const getSoftBookedSlotsByMaid = async(maidId) => {
+const getSoftBookedSlotsByMaid = async (maidId) => {
   try {
     const bookings = await Booking.findAll({
       where: {
@@ -353,27 +353,25 @@ const getSoftBookedSlotsByMaid = async(maidId) => {
       attributes: ['slot']
     });
 
-    const mergedSlotMap = {};
+    const slotArray = [];
 
     bookings.forEach(b => {
       const slot = b.slot;
-      if (!slot || typeof slot !== 'object') return;
-
-      for (const [day, time] of Object.entries(slot)) {
-        if (time && !mergedSlotMap[day]) {
-          mergedSlotMap[day] = time;
-        }
+      if (slot && typeof slot === 'object' && Object.keys(slot).length > 0) {
+        slotArray.push(slot);
       }
     });
 
     return {
-      [maidId]: mergedSlotMap
+      [maidId]: slotArray
     };
 
   } catch (err) {
-    console.error('Error fetching soft booked slot map:', err);
-    return { [maidId]: {} };
+    console.error('Error fetching soft booked slot array:', err);
+    return {
+      [maidId]: []
+    };
   }
-}
+};
 
 module.exports = {getProfile,updateProfile,verifyOtp,sendOtp,getSoftBookedSlotsByMaid,createBooking,searchMaid,bookingConfirm,cancelBooking,getBookings,getBookingsById,getAllLocation};
