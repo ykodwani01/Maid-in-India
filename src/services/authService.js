@@ -47,6 +47,7 @@ const updateProfile = async(uid,data) => {
   user.name = name || user.name ;
   user.contactNumber = contactNumber || user.contactNumber;
   user.address = address || user.address ;
+  user.photoUrl = data.photoUrl || user.photoUrl;
   user.profileCreated=true;
   await user.save();
   return { name: user.name, contactNumber: user.contactNumber, address: user.address, profileCreated: user.profileCreated };
