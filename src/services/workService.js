@@ -113,6 +113,27 @@ cron.schedule('* * * * *', () => {
     deleteStaleSoftBookings();
 });
 
+const getAllMaids = async () => {
+    try {
+        const maids = await Maid.findAll();
+        return maids;
+    } catch (error) {
+        throw new Error("Error fetching maids: " + error.message);
+    }
+};
 
+const makeAdmin = async (email) => {
+    try {
+        const user = await User.findOne({email});
+        if (!user) {
+            throw new Error("User not found");
+        }
+        user.role = "admin";
+        await user.save();
+        return { success: true, message: "User role updated to admin" };
+    }   catch (error) {
+        throw new Error("Error updating user role: " + error.message);
+    }   
+};
 
-module.exports = { getSchedule,scheduleReminderJob, cancelReminderJob };
+module.exports = { getSchedule,scheduleReminderJob, cancelReminderJob,getAllMaids, makeAdmin };
