@@ -50,7 +50,7 @@ const updateProfile = async(uid,data) => {
   user.photoUrl = data.photoUrl || user.photoUrl;
   user.profileCreated=true;
   await user.save();
-  return { name: user.name, contactNumber: user.contactNumber, address: user.address, profileCreated: user.profileCreated };
+  return { name: user.name, contactNumber: user.contactNumber, photoUrl: user.photoUrl, address: user.address, profileCreated: user.profileCreated };
 };
 
 const verifyGoogle = async (data) => {
