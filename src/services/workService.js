@@ -103,7 +103,7 @@ const deleteStaleSoftBookings = async () => {
     for (const booking of bookings) {
         const createdAt = moment(booking.created_at);
         const diffInMinutes = currentTime.diff(createdAt, 'minutes');
-        if (diffInMinutes > 5) {
+        if (diffInMinutes > 9) {
             await booking.destroy();
             console.log(`Deleted stale booking with ID: ${booking.BookingId}`);
         }
